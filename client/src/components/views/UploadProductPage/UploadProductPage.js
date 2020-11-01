@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Form, Input } from 'antd';
 import FileUpload from '../../utils/FileUpload';
+import Axios from 'axios';
 
 const { TextArea } = Input;
 
@@ -14,7 +15,7 @@ const CONTINENTS = [
     {id:7, value: 'Antarctica'}
 ];
 
-const UploadProductionPage = () => {
+const UploadProductionPage = (props) => {
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
     const [price, setPrice] = useState(0);
@@ -22,7 +23,36 @@ const UploadProductionPage = () => {
     const [images, setImages] = useState([]);
 
     const onSubmitForm = (e) => {
+        console.log(e);
         e.preventDefault();
+        if (!title || !desc || !price || !continent || !images) {
+            alert('모든 값 입력');
+            return ;
+        }
+
+        const body = {
+            writer: props.user.userData._id,
+            title,
+            diescription: desc,
+            price,
+            images,
+            continents : continent,
+        }
+
+        console.log(body);
+
+        Axios.post('/api/product', body)
+            .then(res => {
+                if (res.data.success) {
+                    alert('업로드 성공');
+                    props.history.push('/')
+                } else {
+                    alert('업로드 실패');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            })
     };
     const onChangeTitle = (e) => {
         setTitle(e.target.value);
@@ -38,7 +68,6 @@ const UploadProductionPage = () => {
     };
     const updateImages = (newImages) => {
         setImages(newImages);
-        console.log(images);
     };
 
     return (
@@ -69,7 +98,7 @@ const UploadProductionPage = () => {
                 </select>
 
                 <br /><br />
-                <Button type="submit">확인</Button>
+                <button type="submit">확인</button>
             </Form>
         </div>
     )
