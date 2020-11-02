@@ -1,19 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Form, Input } from 'antd';
+import { Form, Input } from 'antd';
 import FileUpload from '../../utils/FileUpload';
 import Axios from 'axios';
+import continents from '../LandingPage/sections/Datas';
 
 const { TextArea } = Input;
-
-const CONTINENTS = [
-    {id:1, value: 'Africa'},
-    {id:2, value: 'Europe'},
-    {id:3, value: 'Asia'},
-    {id:4, value: 'North America'},
-    {id:5, value: 'South America'},
-    {id:6, value: 'Austrailia'},
-    {id:7, value: 'Antarctica'}
-];
 
 const UploadProductionPage = (props) => {
     const [title, setTitle] = useState('');
@@ -92,7 +83,7 @@ const UploadProductionPage = (props) => {
 
                 <br /><br />
                 <select onChange={onChangeContinent} value={continent}>
-                    {CONTINENTS.map(continent => (
+                    {continents.map(continent => (
                         <option value={continent.id} key={continent.id}>{continent.value}</option>
                     ))}
                 </select>
