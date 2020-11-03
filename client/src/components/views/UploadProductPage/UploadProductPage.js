@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input } from 'antd';
 import FileUpload from '../../utils/FileUpload';
 import Axios from 'axios';
-import continents from '../LandingPage/sections/Datas';
+import { continents } from '../LandingPage/sections/Datas';
 
 const { TextArea } = Input;
 

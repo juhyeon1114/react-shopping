@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import Axios from 'axios';
-import { Card, Icon, Col, Row, Collapse } from 'antd';
+import { Card, Icon, Col, Row } from 'antd';
 import ImageSlider from '../../utils/ImageSlider';
-import continents from '../LandingPage/sections/Datas';
-import CheckBox from "../LandingPage/sections/CheckBox";
-import RadioBox from "../LandingPage/sections/RadioBox";
+import { continents, price } from './sections/Datas';
+import CheckBox from "./sections/CheckBox";
+import RadioBox from "./sections/RadioBox";
+import SearchFeature from './sections/SearchFeature';
 
 const LIMIT = 4;
 
@@ -12,9 +13,17 @@ function LandingPage() {
     const [products, setProducts] = useState([]);
     const [skip, setSkip] = useState(0);
     const [postSize, setPostSize] = useState(0);
+    const [filters, setFilters] = useState({ continents: [], price: [] });
+    const [loadMore, setLoadMore] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        const body = { skip, limit: LIMIT };
+        const body = {
+            skip,
+            limit: LIMIT,
+            filters,
+            searchTerm
+        };
 
         Axios.post('/api/product/products', body)
             .then(res => {
@@ -23,7 +32,7 @@ function LandingPage() {
                         alert('더 이상 가져올 상품이 없습니다.')
                     }
                     setPostSize(res.data.productInfo.length);
-                    setProducts(prev => prev.concat(res.data.productInfo));
+                    loadMore ? setProducts(prev => prev.concat(res.data.productInfo)) : setProducts(res.data.productInfo) ;
                 } else {
                     alert('상품 조회 실패');
                 }
@@ -31,7 +40,7 @@ function LandingPage() {
             .catch(error => {
                 console.error(error);
             });
-    }, [skip]);
+    }, [filters, loadMore, searchTerm, skip]);
       
 
     const renderCards = products.map((product, idx) => {
@@ -48,11 +57,32 @@ function LandingPage() {
     });
 
     const loadMoreHandler = () => {
+        setLoadMore(true);
         setSkip(prev => Number(prev) + LIMIT);
     };
-    
-    const handleFilters = (newChecked) => {
-        console.log(newChecked);
+
+    const handlePrice = (value) => {
+        let arr = [];
+        for (let key in price) {
+            if (price[key].id === parseInt(value, 10)) {
+                arr = price[key].array;
+            }
+        }
+        return arr;
+    };
+
+    const handleFilters = (filter, category) => {
+        const newFilters = {...filters};
+        newFilters[category] = category === 'price' ? handlePrice(filter) : filter;
+        setLoadMore(false);
+
+        setFilters(newFilters);
+        setSkip(0);
+    };
+
+    const updateSearchTerm = (newSearchTerm) => {
+        setSearchTerm(newSearchTerm);
+        setSkip(0);
     };
 
     return (
@@ -69,9 +99,15 @@ function LandingPage() {
 
                 <Col sm={12} xs={24}>
                     {/* radio box */}
-                    <RadioBox />
+                    <RadioBox list={price} handleFilters={filter => handleFilters(filter, 'price')} />
                 </Col>
             </Row>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '1rem auto' }}>
+                <SearchFeature
+                    refreshFunction={updateSearchTerm}
+                />
+            </div>
 
             <Row gutter={[16, 16]}>
                 {renderCards}
