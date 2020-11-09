@@ -93,4 +93,27 @@ router.post('/products', (req, res) => {
     
 });
 
+router.get('/products_by_id', (req, res) => {
+    let type = req.query.type;
+    let productIds = req.query.id;
+    if (type === 'single') {
+        Product.find({ _id: productIds })
+            .populate('writer')
+            .exec((err, product) => {
+                return err ? res.status(400).send(err) : res.status(200).send({product, success: true}) ;
+            })
+    } else if (type === 'array') {
+        let ids = [];
+        productIds.split(',').forEach(e => {
+            e ? ids.push(e) : {};
+        });
+
+        Product.find({ _id: {$in: ids} })
+            .populate('writer')
+            .exec((err, product) => {
+                return err ? res.status(400).send(err) : res.status(200).send(product) ;
+            })
+    }
+});
+
 module.exports = router;

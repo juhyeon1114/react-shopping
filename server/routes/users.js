@@ -18,6 +18,8 @@ router.get("/auth", auth, (req, res) => {
         lastname: req.user.lastname,
         role: req.user.role,
         image: req.user.image,
+        cart: req.user.cart,
+        history: req.user.history,
     });
 });
 
@@ -66,6 +68,64 @@ router.get("/logout", auth, (req, res) => {
             success: true
         });
     });
+});
+
+router.post("/addToCart", auth, (req, res) => {
+    // User Collection에 해당 유저의 정보를 다 가져오기
+    User.findOne({ _id: req.user._id }, (err, userInfo) => {
+        // 가져온 정보에서 카트에 넣으려고 하는 상품이 이미 들어있는지 확인하기
+        let duplicate = false;
+        userInfo.cart.forEach((item, idx) => {
+            if (item.id === req.body.productId) {
+                duplicate = true;
+            }
+        });
+
+        
+        if (duplicate) {
+            // 상품이 이미 있을 때
+            User.findOneAndUpdate(
+                { _id: req.user._id, "cart.id" : req.body.productId },
+                {
+                    $inc : { "cart.$.quantity": 1 }
+                },
+                { new : true },
+                ((err, userInfo) => {
+                    if (err) {
+                        res.status(200).json({ success: false, err })
+                    } else {
+                        res.status(200).send(userInfo.cart)
+                    }
+                })
+            )
+        } else {
+            // 상품이 이미 있지 않을 때
+            User.findOneAndUpdate(
+                { _id: req.user.id },
+                {
+                    $push: {
+                        cart: {
+                            id: req.body.productId,
+                            quantity: 1,
+                            date: Date.now()
+                        }
+                    }
+                },
+                { new : true },
+                ((err, userInfo) => {
+                    if (err) {
+                        res.status(200).json({ success: false, err })
+                    } else {
+                        res.status(200).send(userInfo.cart)
+                    }
+                })
+            )
+        }
+    });
+});
+
+router.get("/removeFromCart", auth, (req, res) => {
+    User.findByIdAndRemove( )
 });
 
 module.exports = router;
