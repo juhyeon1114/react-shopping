@@ -33,7 +33,14 @@ export default function(state={},action){
                 cartDetail: action.payload
             }
         case REMOVE_CART_ITEM:
-            return {...state}
+            return {
+                ...state,
+                cartDetail: action.payload.productInfo,
+                userData: {
+                    ...state.userData,
+                    cart: action.payload.cart
+                }
+            }
         default:
             return state;
     }

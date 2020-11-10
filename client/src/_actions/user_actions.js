@@ -9,7 +9,6 @@ import {
     REMOVE_CART_ITEM
 } from './types';
 import { USER_SERVER } from '../components/Config.js';
-import { request } from 'express';
 
 export function registerUser(dataToSubmit){
     const request = axios.post(`${USER_SERVER}/register`,dataToSubmit)
@@ -89,6 +88,15 @@ export function getCartItems(cartItems, userCart) {
 export function removeCartItem(productId) {
     const request = axios.get(`/api/users/removeFromCart?id=${productId}`)
         .then(response => {
+            // productInfo, cart 정보를 조합해서 cartDetail을 만든다
+            console.log(response.data);
+            response.data.cart.forEach(item => {
+                response.data.productInfo.forEach((product, idx) => {
+                    if (item.id && product._id && item.id === product._id) {
+                        response.data.productInfo[idx].quantity = item.quantity;
+                    }
+                });
+            });
             
             return response.data;
         });

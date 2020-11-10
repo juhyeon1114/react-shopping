@@ -2,7 +2,6 @@ import React from 'react';
 import './UserCardBlock.css';
 
 const UserCardBlock = ({ products, removeItem }) => {
-
     const renderCartImage = (images) => {
         if (images && images.length > 0) {
             let image = images[0];
@@ -23,13 +22,13 @@ const UserCardBlock = ({ products, removeItem }) => {
                     $ {product.price}
                 </td>
                 <td>
-                    <button onClick={removeItem(product._id)}>
+                    <button onClick={() => removeItem(product._id)}>
                         remove
                     </button>
                 </td>
             </tr>
         ))
-    );
+    )
 
     return (
         <div>
