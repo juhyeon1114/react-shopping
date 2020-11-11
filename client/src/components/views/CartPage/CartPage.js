@@ -53,17 +53,22 @@ const CartPage = ({ user }) => {
             <UserCardBlock products={user.cartDetail} removeItem={removeFromCart} />
 
             {
-                showTotal ?
-                    <div style={{ marginTop: '3rem' }}>
-                        <h2>Total Amount: ${total}</h2>
-                    </div> :
-                    <>
-                        <br />
-                        <Empty description={false}></Empty>
-                    </>
+                showTotal
+                    ?
+                        <>
+                            <div style={{ marginTop: '3rem' }}>
+                                <h2>Total Amount: ${total}</h2>
+                            </div>
+                            <PayPal total={total}/>
+                        </>
+                    :
+                        <>
+                            <br />
+                            <Empty description={false}></Empty>
+                        </>
             }
             
-            <PayPal />
+            
 
         </div>
     )
